@@ -3,23 +3,23 @@
   "rewrites": [
     {
       "source": "/auth/:path*",
-      "destination": "https://vendor-orchestration-api.onrender.com/auth/:path*"
+      "destination": "https://vendor-orchestration.onrender.com/auth/:path*"
     },
     {
       "source": "/v1/:path*",
-      "destination": "https://vendor-orchestration-api.onrender.com/v1/:path*"
+      "destination": "https://vendor-orchestration.onrender.com/v1/:path*"
     },
     {
       "source": "/health",
-      "destination": "https://vendor-orchestration-api.onrender.com/health"
+      "destination": "https://vendor-orchestration.onrender.com/health"
     },
     {
       "source": "/docs",
-      "destination": "https://vendor-orchestration-api.onrender.com/docs"
+      "destination": "https://vendor-orchestration.onrender.com/docs"
     },
     {
       "source": "/openapi.json",
-      "destination": "https://vendor-orchestration-api.onrender.com/openapi.json"
+      "destination": "https://vendor-orchestration.onrender.com/openapi.json"
     }
   ],
   "headers": [
