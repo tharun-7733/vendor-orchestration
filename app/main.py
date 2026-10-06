@@ -20,6 +20,8 @@ from app.worker import run_screening
 async def lifespan(_: FastAPI):
     # Convenient for local demos; production deployments should run versioned migrations.
     async with engine.begin() as connection:
+        # Serialize the demo's startup DDL when serverless instances cold-start together.
+        await connection.execute(text("SELECT pg_advisory_xact_lock(7241730049021)"))
         await connection.run_sync(Base.metadata.create_all)
         # Add per-user ownership to databases created by the earlier demo version.
         await connection.execute(
@@ -47,7 +49,7 @@ app = FastAPI(
     description="Asynchronous KYC and sanctions screening with normalized case results.",
     lifespan=lifespan,
 )
-app.mount("/assets", StaticFiles(directory="app/static"), name="assets")
+app.mount("/assets", StaticFiles(directory="public/assets"), name="assets")
 app.include_router(auth_router)
 
 
@@ -71,7 +73,7 @@ async def security_headers(request: Request, call_next):
 
 @app.get("/", include_in_schema=False)
 async def dashboard():
-    return FileResponse("app/static/index.html")
+    return FileResponse("public/index.html")
 
 
 @app.get("/health")

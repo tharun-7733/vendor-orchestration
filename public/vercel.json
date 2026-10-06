@@ -1,0 +1,40 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/auth/:path*",
+      "destination": "https://vendor-orchestration-api.onrender.com/auth/:path*"
+    },
+    {
+      "source": "/v1/:path*",
+      "destination": "https://vendor-orchestration-api.onrender.com/v1/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://vendor-orchestration-api.onrender.com/health"
+    },
+    {
+      "source": "/docs",
+      "destination": "https://vendor-orchestration-api.onrender.com/docs"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "https://vendor-orchestration-api.onrender.com/openapi.json"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+        }
+      ]
+    }
+  ]
+}

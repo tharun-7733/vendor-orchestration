@@ -22,6 +22,12 @@ SESSION_COOKIE = "vo_session"
 CSRF_COOKIE = "vo_csrf"
 PBKDF2_ITERATIONS = 600_000
 
+if settings.app_env.lower() == "production":
+    if not settings.session_secret or len(settings.session_secret) < 32:
+        raise RuntimeError("Production requires a SESSION_SECRET of at least 32 characters")
+    if not settings.session_cookie_secure:
+        raise RuntimeError("Production requires SESSION_COOKIE_SECURE=true")
+
 
 class Credentials(BaseModel):
     email: str = Field(min_length=3, max_length=320)
@@ -72,7 +78,7 @@ async def current_user(request: Request) -> User:
 
 def set_session_cookies(response: Response, user_id: uuid.UUID, csrf_token: str) -> None:
     cookie_options = {
-        "secure": settings.session_cookie_secure,
+        "secure": settings.session_cookie_secure or settings.app_env.lower() == "production",
         "samesite": "strict",
         "path": "/",
     }
@@ -124,7 +130,7 @@ async def csrf_token(request: Request, response: Response) -> dict[str, str]:
             token,
             max_age=settings.session_ttl_seconds,
             httponly=False,
-            secure=settings.session_cookie_secure,
+            secure=settings.session_cookie_secure or settings.app_env.lower() == "production",
             samesite="strict",
             path="/",
         )
@@ -185,6 +191,7 @@ async def logout(
     _: User = Depends(current_user),
     __: None = Depends(verify_csrf),
 ) -> Response:
-    response.delete_cookie(SESSION_COOKIE, path="/", secure=settings.session_cookie_secure, httponly=True, samesite="strict")
-    response.delete_cookie(CSRF_COOKIE, path="/", secure=settings.session_cookie_secure, samesite="strict")
+    secure_cookie = settings.session_cookie_secure or settings.app_env.lower() == "production"
+    response.delete_cookie(SESSION_COOKIE, path="/", secure=secure_cookie, httponly=True, samesite="strict")
+    response.delete_cookie(CSRF_COOKIE, path="/", secure=secure_cookie, samesite="strict")
     return response
